@@ -309,35 +309,41 @@ function Top10Rail({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
   const sorted = [...games].sort((a, b) => a.rank - b.rank);
 
   return (
-    <section>
+    <section className="GameSection Home">
+      <div className="wrapper-games wrapper-game-section with-title">
+        <div className="wrapper-games-inner">
 
-      {/* Heading. Uses the design-system .jp-h2 scale (2.25rem = 36px) to
-          match other rail headings on the live site. */}
-      <div style={{display: 'flex', alignItems: 'baseline', marginBottom: 18, gap: 12, flexWrap: 'wrap'}}>
-        <h2 className="jp-h2" style={{margin: 0, color: INK_JP}}>{heading}</h2>
-      </div>
+          {/* Heading — uses the site's native .section-header wrapper so it
+              inherits the same padding, alignment and h2 typography as
+              "Alltime Classics" above. */}
+          <div className="section-header">
+            <h2 style={{margin: 0, color: INK_JP}}>{heading}</h2>
+          </div>
 
-      {/* Row 1 — ranks 1..4, larger tiles. */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',  // 4 equal columns
-        gap: 20,
-        marginBottom: 28,
-      }}>
-        {sorted.slice(0, 4).map(g => (
-          <Top10Card key={g.rank} {...g} size="lg"/>
-        ))}
-      </div>
+          {/* Row 1 — ranks 1..4, larger tiles. */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 20,
+            marginBottom: 28,
+          }}>
+            {sorted.slice(0, 4).map(g => (
+              <Top10Card key={g.rank} {...g} size="lg"/>
+            ))}
+          </div>
 
-      {/* Row 2 — ranks 5..9, smaller tiles evenly distributed. */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
-        gap: 16,
-      }}>
-        {sorted.slice(4, 9).map(g => (
-          <Top10Card key={g.rank} {...g} size="sm"/>
-        ))}
+          {/* Row 2 — ranks 5..9, smaller tiles evenly distributed. */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: 16,
+          }}>
+            {sorted.slice(4, 9).map(g => (
+              <Top10Card key={g.rank} {...g} size="sm"/>
+            ))}
+          </div>
+
+        </div>
       </div>
     </section>
   );
