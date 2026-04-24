@@ -309,7 +309,7 @@ function Top10Rail({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
   const sorted = [...games].sort((a, b) => a.rank - b.rank);
 
   return (
-    <section style={{padding: '28px 32px'}}>
+    <section>
 
       {/* Heading. Uses the design-system .jp-h2 scale (2.25rem = 36px) to
           match other rail headings on the live site. */}
