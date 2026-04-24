@@ -314,7 +314,7 @@ function Top10Rail({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
       {/* Heading. Uses the design-system .jp-h2 scale (2.25rem = 36px) to
           match other rail headings on the live site. */}
       <div style={{display: 'flex', alignItems: 'baseline', marginBottom: 18, gap: 12, flexWrap: 'wrap'}}>
-        <h2 className="jp-h2" style={{...displayItalicJP, fontSize: '2.25rem', margin: 0, color: INK_JP}}>{heading}</h2>
+        <h2 className="jp-h2" style={{margin: 0, color: INK_JP}}>{heading}</h2>
       </div>
 
       {/* Row 1 — ranks 1..4, larger tiles. */}
