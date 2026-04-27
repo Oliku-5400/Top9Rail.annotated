@@ -206,7 +206,7 @@ function Top10CardMobile({ rank, title, min, max, href, image }) {
 /* =========================================================================
  * <Top10RailMobile />
  * ========================================================================= */
-function Top10RailMobile({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
+function Top10RailMobile({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
   const [games, setGames] = React.useState(TOP10_GAMES_FALLBACK_M);
   const [progress, setProgress] = React.useState(0);  // 0..1
   const scrollerRef = React.useRef(null);
@@ -254,14 +254,15 @@ function Top10RailMobile({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     <section style={{padding: '20px 0 18px'}}>
 
       {/* Heading — sized down for mobile but same display style. */}
-      <div style={{padding: '0 16px', marginBottom: 14}}>
-        <h2 style={{
-          ...displayItalicJP_M,
-          fontSize: 'clamp(20px, 6vw, 28px)',
-          margin: 0,
-          color: INK_JP_M,
-        }}>{heading}</h2>
-      </div>
+<div style={{padding: '0 16px'}}>
+  <h2 style={{
+    font: 'italic normal 900 22px/27px Roboto, sans-serif',
+    textTransform: 'uppercase',
+    color: '#000',
+    margin: '0 0 10px 0',
+    letterSpacing: 0,
+  }}>{heading}</h2>
+</div>
 
       {/* Horizontal scroller */}
       <div
