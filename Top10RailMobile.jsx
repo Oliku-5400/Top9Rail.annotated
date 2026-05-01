@@ -254,7 +254,7 @@ function Top10RailMobile({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
     <section style={{padding: '20px 0 18px'}}>
 
       {/* Heading — sized down for mobile but same display style. */}
-<div style={{padding: '0 16px'}}> 
+<div style={{padding: '0'}}> 
   <h2 style={{
     font: 'italic normal 900 22px/27px Roboto, sans-serif',
     textTransform: 'uppercase',
