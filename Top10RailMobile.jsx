@@ -254,7 +254,7 @@ function Top10RailMobile({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
     <section style={{padding: '20px 0 18px'}}>
 
       {/* Heading — sized down for mobile but same display style. */}
-<div>
+<div style={{padding: '0 16px'}}> 
   <h2 style={{
     font: 'italic normal 900 22px/27px Roboto, sans-serif',
     textTransform: 'uppercase',
@@ -276,8 +276,8 @@ function Top10RailMobile({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
           overflowY: 'visible',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
-padding: '4px 0 24px',
-scrollPaddingLeft: 0,
+padding: '4px 16px 24px',
+scrollPaddingLeft: 16,
         }}
       >
         {sorted.map(g => (
