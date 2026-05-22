@@ -8,6 +8,8 @@
  *   • Exactly 4.3 cards visible at a time — the partial 5th card signals
  *     there is more to scroll.
  *   • Free horizontal scroll (no snap) with native scrollbar hidden.
+ *   • Mouse drag-to-scroll on desktop (grab cursor); touch scroll on mobile.
+ *   • Dragging does not accidentally trigger card link navigation.
  *   • Thin red progress bar below the rail tracks scroll position.
  *   • Card widths are calculated dynamically from the container width via
  *     ResizeObserver, so the 4.3-visible rule holds at any container size.
@@ -91,7 +93,7 @@ async function fetchTop10FromStrapi() {
  * Identical to the original size="lg" card. Width is driven by the CSS
  * custom property --t10-card-w set by the rail on its scroller element.
  * ========================================================================= */
-function Top10Card({ rank, title, min, max, href, image }) {
+function Top10Card({ rank, title, min, max, href, image, isDragging }) {
   const art = TOP10_ART[title] || { bg: 'linear-gradient(135deg, #6B0119, #C10230)', accent: '#F8CB3B', provider: '' };
   const hasImage = !!(image && image.trim());
 
@@ -100,6 +102,7 @@ function Top10Card({ rank, title, min, max, href, image }) {
       href={href || '#'}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={(e) => { if (isDragging && isDragging()) e.preventDefault(); }}
       style={{
         flex: '0 0 auto',
         width: 'var(--t10-card-w, 22%)',
@@ -222,6 +225,42 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
   const [progress, setProgress] = React.useState(0); // 0..1
   const scrollerRef = React.useRef(null);
 
+  // Mouse drag-to-scroll state.
+  const dragRef = React.useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
+
+  const onMouseDown = React.useCallback((e) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    dragRef.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft, moved: false };
+    el.style.cursor = 'grabbing';
+    el.style.userSelect = 'none';
+  }, []);
+
+  const onMouseMove = React.useCallback((e) => {
+    const drag = dragRef.current;
+    if (!drag.active) return;
+    const dx = e.pageX - drag.startX;
+    if (Math.abs(dx) > 4) drag.moved = true;
+    scrollerRef.current.scrollLeft = drag.scrollLeft - dx;
+  }, []);
+
+  const onMouseUp = React.useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    dragRef.current.active = false;
+    el.style.cursor = 'grab';
+    el.style.userSelect = '';
+  }, []);
+
+  // Cancel drag if mouse leaves the scroller entirely.
+  const onMouseLeave = React.useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el || !dragRef.current.active) return;
+    dragRef.current.active = false;
+    el.style.cursor = 'grab';
+    el.style.userSelect = '';
+  }, []);
+
   // Fetch live data from Strapi on mount.
   React.useEffect(() => {
     let cancelled = false;
@@ -274,6 +313,10 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
           <div
             ref={scrollerRef}
             onScroll={onScroll}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseLeave}
             style={{
               display: 'flex',
               gap: 20,
@@ -283,10 +326,11 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
               msOverflowStyle: 'none',       // IE/Edge legacy
               WebkitOverflowScrolling: 'touch',
               padding: '4px 0 8px',
+              cursor: 'grab',
             }}
           >
             {sorted.map(g => (
-              <Top10Card key={g.rank} {...g} />
+              <Top10Card key={g.rank} {...g} isDragging={() => dragRef.current.moved} />
             ))}
             {/* Trailing spacer so the last card isn't flush against the edge */}
             <div aria-hidden style={{ flex: '0 0 4px' }} />
