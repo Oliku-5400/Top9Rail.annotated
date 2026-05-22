@@ -250,6 +250,9 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     dragRef.current.active = false;
     el.style.cursor = 'grab';
     el.style.userSelect = '';
+    // Reset moved AFTER the click event has fired on the card anchor,
+    // otherwise the guard always sees moved=false and lets the click through.
+    setTimeout(() => { dragRef.current.moved = false; }, 0);
   }, []);
 
   // Cancel drag if mouse leaves the scroller entirely.
@@ -259,6 +262,7 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     dragRef.current.active = false;
     el.style.cursor = 'grab';
     el.style.userSelect = '';
+    setTimeout(() => { dragRef.current.moved = false; }, 0);
   }, []);
 
   // Fetch live data from Strapi on mount.
