@@ -8,9 +8,8 @@
  *   • Exactly 4.3 cards visible at a time — the partial 5th card signals
  *     there is more to scroll.
  *   • Free horizontal scroll (no snap) with native scrollbar hidden.
- *   • Mouse drag-to-scroll on desktop (grab cursor); touch scroll on mobile.
- *   • Dragging does not accidentally trigger card link navigation.
  *   • Thin red progress bar below the rail tracks scroll position.
+ *   • Progress bar thumb is draggable — click or drag it to scroll the rail.
  *   • Card widths are calculated dynamically from the container width via
  *     ResizeObserver, so the 4.3-visible rule holds at any container size.
  *
@@ -93,7 +92,7 @@ async function fetchTop10FromStrapi() {
  * Identical to the original size="lg" card. Width is driven by the CSS
  * custom property --t10-card-w set by the rail on its scroller element.
  * ========================================================================= */
-function Top10Card({ rank, title, min, max, href, image, isDragging }) {
+function Top10Card({ rank, title, min, max, href, image }) {
   const art = TOP10_ART[title] || { bg: 'linear-gradient(135deg, #6B0119, #C10230)', accent: '#F8CB3B', provider: '' };
   const hasImage = !!(image && image.trim());
 
@@ -102,7 +101,6 @@ function Top10Card({ rank, title, min, max, href, image, isDragging }) {
       href={href || '#'}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={(e) => { if (isDragging && isDragging()) e.preventDefault(); }}
       style={{
         flex: '0 0 auto',
         width: 'var(--t10-card-w, 22%)',
@@ -224,46 +222,10 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
   const [games, setGames] = React.useState(TOP10_GAMES_FALLBACK);
   const [progress, setProgress] = React.useState(0); // 0..1
   const scrollerRef = React.useRef(null);
+  const trackRef = React.useRef(null);
 
-  // Mouse drag-to-scroll state.
-  const dragRef = React.useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
-
-  const onMouseDown = React.useCallback((e) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    dragRef.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft, moved: false };
-    el.style.cursor = 'grabbing';
-    el.style.userSelect = 'none';
-  }, []);
-
-  const onMouseMove = React.useCallback((e) => {
-    const drag = dragRef.current;
-    if (!drag.active) return;
-    const dx = e.pageX - drag.startX;
-    if (Math.abs(dx) > 4) drag.moved = true;
-    scrollerRef.current.scrollLeft = drag.scrollLeft - dx;
-  }, []);
-
-  const onMouseUp = React.useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    dragRef.current.active = false;
-    el.style.cursor = 'grab';
-    el.style.userSelect = '';
-    // Reset moved AFTER the click event has fired on the card anchor,
-    // otherwise the guard always sees moved=false and lets the click through.
-    setTimeout(() => { dragRef.current.moved = false; }, 0);
-  }, []);
-
-  // Cancel drag if mouse leaves the scroller entirely.
-  const onMouseLeave = React.useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el || !dragRef.current.active) return;
-    dragRef.current.active = false;
-    el.style.cursor = 'grab';
-    el.style.userSelect = '';
-    setTimeout(() => { dragRef.current.moved = false; }, 0);
-  }, []);
+  // Scrubber drag state — tracks whether the user is dragging the thumb.
+  const scrubRef = React.useRef({ active: false, startX: 0, startProgress: 0 });
 
   // Fetch live data from Strapi on mount.
   React.useEffect(() => {
@@ -282,7 +244,6 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     const el = scrollerRef.current;
     if (!el) return;
     const update = () => {
-      // 3 gaps of 20px between the first 4 visible cards.
       const cardW = Math.floor((el.clientWidth - 3 * 20) / 4.3);
       el.style.setProperty('--t10-card-w', cardW + 'px');
     };
@@ -293,13 +254,64 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     return () => { ro.disconnect(); window.removeEventListener('resize', update); };
   }, []);
 
-  // Update progress bar as the user scrolls.
+  // Update progress state as the rail scrolls (driven by native scroll or
+  // programmatic scrollLeft changes from the scrubber).
   const onScroll = React.useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     setProgress(max > 0 ? el.scrollLeft / max : 0);
   }, []);
+
+  // ── Scrubber: click on track to jump, drag thumb to scrub ──────────────
+
+  // Converts a pointer X position within the track into a 0..1 progress
+  // value, accounting for the thumb width so the thumb never overruns the
+  // track edges.
+  const THUMB_PCT = 44; // thumb is 44% of track width (mirrors mobile)
+
+  function progressFromPointer(pageX) {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const rect = track.getBoundingClientRect();
+    const usable = rect.width * (1 - THUMB_PCT / 100);
+    const x = Math.max(0, Math.min(pageX - rect.left, usable));
+    return x / usable;
+  }
+
+  function applyProgress(p) {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const clamped = Math.max(0, Math.min(1, p));
+    const max = el.scrollWidth - el.clientWidth;
+    el.scrollLeft = clamped * max;
+    // Progress state will update via the onScroll handler above.
+  }
+
+  const onTrackMouseDown = React.useCallback((e) => {
+    e.preventDefault();
+    const p = progressFromPointer(e.pageX);
+    applyProgress(p);
+    scrubRef.current = { active: true, startX: e.pageX, startProgress: p };
+    document.addEventListener('mousemove', onDocMouseMove);
+    document.addEventListener('mouseup', onDocMouseUp);
+  }, []);
+
+  function onDocMouseMove(e) {
+    if (!scrubRef.current.active) return;
+    const track = trackRef.current;
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    const usable = rect.width * (1 - THUMB_PCT / 100);
+    const dx = e.pageX - scrubRef.current.startX;
+    applyProgress(scrubRef.current.startProgress + dx / usable);
+  }
+
+  function onDocMouseUp() {
+    scrubRef.current.active = false;
+    document.removeEventListener('mousemove', onDocMouseMove);
+    document.removeEventListener('mouseup', onDocMouseUp);
+  }
 
   const sorted = [...games].sort((a, b) => a.rank - b.rank).slice(0, 9);
 
@@ -308,55 +320,57 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
       <div className="wrapper-games wrapper-game-section with-title">
         <div className="wrapper-games-inner">
 
-          {/* Heading — same wrapper as original for consistent site styling. */}
+          {/* Heading */}
           <div className="section-header">
             <h2 style={{ margin: 0, color: INK_JP }}>{heading}</h2>
           </div>
 
-          {/* Horizontal scroller */}
+          {/* Horizontal scroller — native scroll only, no grab cursor */}
           <div
             ref={scrollerRef}
             onScroll={onScroll}
-            onMouseDown={onMouseDown}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseLeave}
             style={{
               display: 'flex',
               gap: 20,
               overflowX: 'auto',
               overflowY: 'visible',
-              scrollbarWidth: 'none',        // Firefox
-              msOverflowStyle: 'none',       // IE/Edge legacy
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
               WebkitOverflowScrolling: 'touch',
               padding: '4px 0 8px',
-              cursor: 'grab',
             }}
           >
             {sorted.map(g => (
-              <Top10Card key={g.rank} {...g} isDragging={() => dragRef.current.moved} />
+              <Top10Card key={g.rank} {...g} />
             ))}
-            {/* Trailing spacer so the last card isn't flush against the edge */}
             <div aria-hidden style={{ flex: '0 0 4px' }} />
           </div>
 
-          {/* Progress bar */}
-          <div style={{
-            marginTop: 10,
-            height: 3,
-            borderRadius: 2,
-            background: 'rgba(29,30,27,0.10)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
+          {/* Draggable progress bar scrubber */}
+          <div
+            ref={trackRef}
+            onMouseDown={onTrackMouseDown}
+            style={{
+              marginTop: 10,
+              height: 6,           // slightly taller than before so it's easier to grab
+              borderRadius: 3,
+              background: 'rgba(29,30,27,0.10)',
+              position: 'relative',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            {/* Thumb */}
             <div style={{
               position: 'absolute',
               top: 0, bottom: 0,
-              width: '44%',
-              left: `${progress * 56}%`, // (100 - thumbWidth) so right edge stops at 100%
+              width: `${THUMB_PCT}%`,
+              left: `${progress * (100 - THUMB_PCT)}%`,
               background: RED_JP,
-              borderRadius: 2,
-              transition: 'left 80ms linear',
+              borderRadius: 3,
+              transition: scrubRef.current.active ? 'none' : 'left 80ms linear',
+              cursor: 'grab',
+              pointerEvents: 'none', // track receives all pointer events
             }} />
           </div>
 
