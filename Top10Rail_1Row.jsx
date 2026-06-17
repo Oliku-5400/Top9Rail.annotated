@@ -98,10 +98,8 @@ function Top10Card({ rank, title, min, max, href, image }) {
 
   return (
     <a
-      href={href || '#'}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
+    href={href || '#'}
+    style={{
         flex: '0 0 auto',
         width: 'var(--t10-card-w, 22%)',
         display: 'flex',
