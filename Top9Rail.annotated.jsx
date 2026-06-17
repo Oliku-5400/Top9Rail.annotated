@@ -133,7 +133,7 @@ function Top10Card({ rank, title, min, max, href, image, size = 'lg' }) {
   return (
     // target=_blank opens in a new tab; rel=noopener,noreferrer is the
     // standard security/performance best practice for external links.
-    <a href={href || '#'} target="_blank" rel="noopener noreferrer"
+    <a href={href || '#'}
       style={{
         cursor: 'pointer',
         display: 'flex', flexDirection: 'column',
