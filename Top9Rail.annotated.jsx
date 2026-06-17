@@ -292,7 +292,7 @@ async function fetchTop10FromStrapi() {
  * the component has unmounted (React 18 StrictMode re-mounts in dev).
  * Sorting by rank is defensive — editors may enter games out of order.
  * ========================================================================= */
-function Top10Rail({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
+function Top10Rail({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
   const [games, setGames] = React.useState(TOP10_GAMES_FALLBACK);
 
   React.useEffect(() => {
