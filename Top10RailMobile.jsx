@@ -100,8 +100,6 @@ function Top10CardMobile({ rank, title, min, max, href, image }) {
   return (
     <a
       href={href || '#'}
-      target="_blank"
-      rel="noopener noreferrer"
       className="t10m-card"
       style={{
         position: 'relative',
