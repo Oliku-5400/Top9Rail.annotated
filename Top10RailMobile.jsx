@@ -204,7 +204,7 @@ function Top10CardMobile({ rank, title, min, max, href, image }) {
 /* =========================================================================
  * <Top10RailMobile />
  * ========================================================================= */
-function Top10RailMobile({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
+function Top10RailMobile({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
   const [games, setGames] = React.useState(TOP10_GAMES_FALLBACK_M);
   const [progress, setProgress] = React.useState(0);  // 0..1
   const scrollerRef = React.useRef(null);
