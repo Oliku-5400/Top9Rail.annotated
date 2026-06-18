@@ -338,7 +338,7 @@ function Top10Rail({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
             gridTemplateColumns: 'repeat(5, 1fr)',
             gap: 16,
           }}>
-            {sorted.slice(4, 9).map(g => (
+            {sorted.slice(4, 10).map(g => (
               <Top10Card key={g.rank} {...g} size="sm"/>
             ))}
           </div>
