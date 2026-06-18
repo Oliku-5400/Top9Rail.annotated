@@ -80,6 +80,7 @@ const TOP10_ART = {
   'Mummy Full of Wilds':   {bg: 'linear-gradient(135deg, #1B3D0F 0%, #3B8A1F 55%, #CBE88A 100%)', accent: '#FFD97A', provider: 'Greentube'},
   'Joker 81':              {bg: 'linear-gradient(135deg, #0A0A2E 0%, #2B1B66 50%, #C10230 100%)', accent: '#F8CB3B', provider: 'Synot'},
   'Mighty Wild Panther':   {bg: 'linear-gradient(135deg, #1A1A1A 0%, #3E2E5B 55%, #6C3B9A 100%)', accent: '#F8CB3B', provider: 'Wazdan'},
+  'Mighty Wild Panther':   {bg: 'linear-gradient(135deg, #1A1A1A 0%, #3E2E5B 55%, #6C3B9A 100%)', accent: '#F8CB3B', provider: 'Wazdan'},
 };
 
 
@@ -103,6 +104,7 @@ const TOP10_GAMES_FALLBACK = [
   {rank: 7, title: 'Mummy Full of Wilds',     min: '0.10 CHF', max: "3'500.00 CHF",  href: 'https://www.jackpots.ch/de/spiel/333-fat-frogs',                  image: '' /* Add link here for thumbnail 7 */},
   {rank: 8, title: 'Joker 81',                min: '0.10 CHF', max: "2'500.00 CHF",  href: 'https://www.jackpots.ch/de/spiel/baa-baa-baa',                    image: '' /* Add link here for thumbnail 8 */},
   {rank: 9, title: 'Mighty Wild Panther',     min: '0.20 CHF', max: "2'000.00 CHF",  href: 'https://www.jackpots.ch/de/spiel/supercharged-clovers-hold-and-win', image: '' /* Add link here for thumbnail 9 */},
+  {rank: 10, title: 'Mighty Wild Panther',     min: '0.20 CHF', max: "2'000.00 CHF",  href: 'https://www.jackpots.ch/de/spiel/supercharged-clovers-hold-and-win', image: '' /* Add link here for thumbnail 9 */},
 ];
 
 
