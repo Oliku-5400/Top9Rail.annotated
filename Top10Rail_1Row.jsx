@@ -313,7 +313,7 @@ function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     document.removeEventListener('mouseup', onDocMouseUp);
   }
 
-  const sorted = [...games].sort((a, b) => a.rank - b.rank).slice(0, 9);
+  const sorted = [...games].sort((a, b) => a.rank - b.rank).slice(0, 10);
 
   return (
     <section className="GameSection Home">
