@@ -216,7 +216,7 @@ function Top10Card({ rank, title, min, max, href, image }) {
  * partial fifth card signals scrollability. Card widths are recalculated
  * on mount and on container resize via ResizeObserver.
  * ========================================================================= */
-function Top10Rail_1Row({ heading = 'TOP 9 MOST POPULAR GAMES' }) {
+function Top10Rail_1Row({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
   const [games, setGames] = React.useState(TOP10_GAMES_FALLBACK);
   const [progress, setProgress] = React.useState(0); // 0..1
   const scrollerRef = React.useRef(null);
