@@ -246,7 +246,7 @@ function Top10RailMobile({ heading = 'TOP 10 MOST POPULAR GAMES' }) {
     setProgress(max > 0 ? el.scrollLeft / max : 0);
   }, []);
 
-  const sorted = [...games].sort((a, b) => a.rank - b.rank).slice(0, 9);
+  const sorted = [...games].sort((a, b) => a.rank - b.rank).slice(0, 10);
 
   return (
     <section style={{padding: '20px 0 18px'}}>
