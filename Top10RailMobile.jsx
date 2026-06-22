@@ -101,6 +101,7 @@ function Top10CardMobile({ rank, title, min, max, href, image }) {
     <a
       href={href || '#'}
       className="t10m-card"
+      onClick={() => window.Kameleoon && window.Kameleoon.API.Goals.processConversion('top10-click-rank-' + rank)}
       style={{
         position: 'relative',
         flex: '0 0 auto',
