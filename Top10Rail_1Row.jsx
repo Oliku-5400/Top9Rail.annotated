@@ -98,8 +98,9 @@ function Top10Card({ rank, title, min, max, href, image }) {
 
   return (
     <a
-    href={href || '#'}
-    style={{
+      href={href || '#'}
+      onClick={() => window.Kameleoon && window.Kameleoon.API.Goals.processConversion('top10-click-rank-' + rank)}
+      style={{
         flex: '0 0 auto',
         width: 'var(--t10-card-w, 22%)',
         display: 'flex',
