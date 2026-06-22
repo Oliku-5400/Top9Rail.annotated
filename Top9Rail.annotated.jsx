@@ -134,7 +134,8 @@ function Top10Card({ rank, title, min, max, href, image, size = 'lg' }) {
     // target=_blank opens in a new tab; rel=noopener,noreferrer is the
     // standard security/performance best practice for external links.
     <a href={href || '#'}
-      style={{
+        onClick={() => window.Kameleoon && window.Kameleoon.API.Goals.processConversion('top10-click-rank-' + rank)}
+        style={{
         cursor: 'pointer',
         display: 'flex', flexDirection: 'column',
         minWidth: 0,                          // lets the tile shrink inside CSS grid cells
