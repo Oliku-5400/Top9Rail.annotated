@@ -197,6 +197,10 @@
    * Styles (desktop)
    * ===================================================================== */
   injectStyles('potm-styles', [
+    // Align with the site's game rows: same wrapper classes as the GameSection
+    // rows (incl. `with-title`), plus 2.5px = the padding of each .GameBox tile,
+    // so the banner starts/ends exactly where the first/last game tile does.
+    '.potm,.potm-skeleton{margin:0 2.5px;}',
     '.potm{position:relative;display:flex;align-items:stretch;height:clamp(360px,31vw,460px);border-radius:16px;overflow:hidden;background:' + INK_JP + ';color:#fff;font-family:Roboto,Arial,sans-serif;isolation:isolate;}',
     '.potm-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:-2;}',
     '.potm-bg--fallback{background:radial-gradient(120% 140% at 80% 50%,#3a3b37 0%,' + INK_JP + ' 60%);}',
@@ -263,7 +267,7 @@
     if (data.status === 'loading') {
       return (
         <section className="GameSection Home">
-          <div className="wrapper-games wrapper-game-section">
+          <div className="wrapper-games wrapper-game-section with-title">
             <div className="wrapper-games-inner"><div className="potm-skeleton" aria-hidden="true" /></div>
           </div>
         </section>
@@ -278,7 +282,7 @@
 
     return (
       <section className="GameSection Home">
-        <div className="wrapper-games wrapper-game-section">
+        <div className="wrapper-games wrapper-game-section with-title">
           <div className="wrapper-games-inner">
             <div
               className="potm"
