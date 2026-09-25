@@ -120,7 +120,7 @@
       providerLogo: payload.providerLogo || '',
       // Optional: brighten/dim the logo without editing the file. 1 = unchanged,
       // e.g. 1.6 turns a mid-grey (#808080) logo into a light grey (#CDCDCD).
-      logoBrightness: (function (b) { b = parseFloat(b); return isFinite(b) && b > 0 ? Math.min(3, Math.max(0.5, b)) : 1; })(payload.logoBrightness),
+      logoBrightness: (function (b) { b = parseFloat(b); return isFinite(b) && b > 0 ? Math.min(3, Math.max(0.5, b)) : 1.6; })(payload.logoBrightness),
       providerName: pick(payload.providerName, lang),
       tagline:      pick(payload.tagline, lang),
       title:        pick(payload.title, lang),
