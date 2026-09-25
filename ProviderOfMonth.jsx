@@ -118,6 +118,9 @@
       background:   payload.background || '',
       backgroundMobile: payload.backgroundMobile || '',   // optional, portrait; mobile falls back to `background`
       providerLogo: payload.providerLogo || '',
+      // Optional: brighten/dim the logo without editing the file. 1 = unchanged,
+      // e.g. 1.6 turns a mid-grey (#808080) logo into a light grey (#CDCDCD).
+      logoBrightness: (function (b) { b = parseFloat(b); return isFinite(b) && b > 0 ? Math.min(3, Math.max(0.5, b)) : 1; })(payload.logoBrightness),
       providerName: pick(payload.providerName, lang),
       tagline:      pick(payload.tagline, lang),
       title:        pick(payload.title, lang),
@@ -301,7 +304,7 @@
               <div className="potm-content">
                 <div className="potm-logo">
                   {content.providerLogo
-                    ? <img src={content.providerLogo} alt={content.providerName || 'Provider'} />
+                    ? <img src={content.providerLogo} alt={content.providerName || 'Provider'} style={content.logoBrightness !== 1 ? { filter: 'brightness(' + content.logoBrightness + ')' } : undefined} />
                     : <span>{content.providerName}</span>}
                 </div>
                 {content.tagline && <p className="potm-tagline">{content.tagline}</p>}
