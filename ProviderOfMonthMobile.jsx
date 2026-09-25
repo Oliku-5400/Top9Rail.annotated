@@ -14,7 +14,7 @@
  *   • Strapi config name 'provider-of-the-month', language from URL
  *     (/de/, /en/, /fr/, /it/ → fallback DE), per-language text + hrefs.
  *   • 4 s autoplay, reduced-motion respected, MIN/MAX on centre card only.
- *   • Kameleoon goals: 'potm-click-cta' and 'potm-click-game-rank-<n>'.
+ *   • Kameleoon goals: 'potm-click-cta', 'potm-click-game' (+ optional 'potm-click-game-rank-<n>').
  *   • Renders nothing if Strapi fails, is malformed or `active: false`.
  * ========================================================================= */
 (function () {
@@ -100,6 +100,9 @@
       background:   payload.background || '',
       backgroundMobile: payload.backgroundMobile || '',   // optional, portrait; mobile falls back to `background`
       providerLogo: payload.providerLogo || '',
+      // Optional: brighten/dim the logo without editing the file. 1 = unchanged,
+      // e.g. 1.6 turns a mid-grey (#808080) logo into a light grey (#CDCDCD).
+      logoBrightness: (function (b) { b = parseFloat(b); return isFinite(b) && b > 0 ? Math.min(3, Math.max(0.5, b)) : 1; })(payload.logoBrightness),
       providerName: pick(payload.providerName, lang),
       tagline:      pick(payload.tagline, lang),
       title:        pick(payload.title, lang),
@@ -255,7 +258,7 @@
           {/* ---- Top: logo, tagline, title, CTA ---- */}
           <div className="potm-m-logo">
             {content.providerLogo
-              ? <img src={content.providerLogo} alt={content.providerName || 'Provider'} />
+              ? <img src={content.providerLogo} alt={content.providerName || 'Provider'} style={content.logoBrightness !== 1 ? { filter: 'brightness(' + content.logoBrightness + ')' } : undefined} />
               : <span>{content.providerName}</span>}
           </div>
           {content.tagline && <p className="potm-m-tagline">{content.tagline}</p>}
@@ -290,7 +293,8 @@
                     onClick={function (e) {
                       if (swipedRef.current) { e.preventDefault(); swipedRef.current = false; return; }
                       if (abs !== 0) { e.preventDefault(); go(i); return; }
-                      trackGoal('potm-click-game-rank-' + g.rank);
+                      trackGoal('potm-click-game');                  // one goal for all game clicks
+                      trackGoal('potm-click-game-rank-' + g.rank);  // optional: only counts if this goal exists in Kameleoon
                     }}
                   >
                     <img src={g.image} alt={g.title} draggable="false" decoding="async" />
