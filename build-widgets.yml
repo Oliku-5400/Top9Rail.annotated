@@ -1,0 +1,58 @@
+# Builds plain JavaScript from every .jsx file in the repo root.
+#
+#   ProviderOfMonth.jsx  ->  dist/ProviderOfMonth.js
+#   Top10Rail_1Row.jsx   ->  dist/Top10Rail_1Row.js   … and so on
+#
+# Runs automatically whenever a .jsx file is pushed. The Kameleoon scripts
+# load the files from dist/, so browsers no longer need Babel.
+#
+# After a push, wait until this workflow has finished (Actions tab, green tick),
+# then copy the hash of the newest commit ("Build dist [skip ci]") into
+# the Kameleoon scripts.
+
+name: Build widgets
+
+on:
+  push:
+    paths:
+      - '*.jsx'
+      - 'babel.config.json'
+      - '.github/workflows/build-widgets.yml'
+  workflow_dispatch: {}   # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Babel (build machine only, not shipped to visitors)
+        run: npm install --no-save --no-package-lock @babel/cli@7 @babel/core@7 @babel/preset-env@7 @babel/preset-react@7
+
+      - name: Compile JSX to dist/*.js
+        run: |
+          mkdir -p dist
+          for f in *.jsx; do
+            out="dist/${f%.jsx}.js"
+            npx babel "$f" --config-file ./babel.config.json --out-file "$out"
+            echo "built $out"
+          done
+
+      - name: Commit dist if it changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git add dist
+          if git diff --cached --quiet; then
+            echo "dist is up to date"
+          else
+            git commit -m "Build dist [skip ci]"
+            git push
+          fi
