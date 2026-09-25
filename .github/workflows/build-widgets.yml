@@ -23,15 +23,20 @@ on:
 permissions:
   contents: write
 
+# Never run two builds at the same time (avoids push conflicts).
+concurrency:
+  group: build-widgets
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Babel (build machine only, not shipped to visitors)
         run: npm install --no-save --no-package-lock @babel/cli@7 @babel/core@7 @babel/preset-env@7 @babel/preset-react@7
@@ -52,7 +57,18 @@ jobs:
           git add dist
           if git diff --cached --quiet; then
             echo "dist is up to date"
+            exit 0
+          fi
+          git commit -m "Build dist [skip ci]"
+          # The branch may have moved on since this run started (e.g. a
+          # re-run, or someone pushed in the meantime): put our commit on top
+          # of the latest state first, then push.
+          git pull --rebase --autostash origin "$GITHUB_REF_NAME" || {
+            echo "Rebase conflict in dist/ - keeping the freshly built files"
+            git checkout --theirs dist && git add dist && GIT_EDITOR=true git rebase --continue
+          }
+          if git diff --quiet "origin/$GITHUB_REF_NAME" HEAD -- dist; then
+            echo "dist on GitHub already matches this build - nothing to push"
           else
-            git commit -m "Build dist [skip ci]"
-            git push
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
