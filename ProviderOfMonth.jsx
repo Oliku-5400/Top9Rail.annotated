@@ -21,7 +21,7 @@
  *   • Click the centre card → opens the game (href for current language).
  *   • ← / → keys move the carousel when it has focus.
  *   • MIN / MAX bet is shown on the centre card only.
- *   • Kameleoon goals: 'potm-click-cta' and 'potm-click-game-rank-<n>'.
+ *   • Kameleoon goals: 'potm-click-cta', 'potm-click-game' (+ optional 'potm-click-game-rank-<n>').
  *   • If Strapi is unreachable, returns bad data or `active: false`,
  *     the widget renders nothing (no stale / wrong provider promo).
  *
@@ -120,7 +120,7 @@
       providerLogo: payload.providerLogo || '',
       // Optional: brighten/dim the logo without editing the file. 1 = unchanged,
       // e.g. 1.6 turns a mid-grey (#808080) logo into a light grey (#CDCDCD).
-      logoBrightness: (function (b) { b = parseFloat(b); return isFinite(b) && b > 0 ? Math.min(3, Math.max(0.5, b)) : 1.6; })(payload.logoBrightness),
+      logoBrightness: (function (b) { b = parseFloat(b); return isFinite(b) && b > 0 ? Math.min(3, Math.max(0.5, b)) : 1; })(payload.logoBrightness),
       providerName: pick(payload.providerName, lang),
       tagline:      pick(payload.tagline, lang),
       title:        pick(payload.title, lang),
@@ -341,7 +341,8 @@
                         aria-label={g.title}
                         onClick={function (e) {
                           if (abs !== 0) { e.preventDefault(); c.go(i); return; }
-                          trackGoal('potm-click-game-rank-' + g.rank);
+                          trackGoal('potm-click-game');                  // one goal for all game clicks
+                          trackGoal('potm-click-game-rank-' + g.rank);  // optional: only counts if this goal exists in Kameleoon
                         }}
                       >
                         <img src={g.image} alt={g.title} draggable="false" decoding="async" />
